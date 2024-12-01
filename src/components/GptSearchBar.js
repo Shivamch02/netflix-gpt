@@ -25,7 +25,7 @@ const GptSearchBar = () => {
   };
 
   const handleGptSearchClick = async () => {
-    console.log(searchText.current.value);
+    // console.log(searchText.current.value);
     //make an api call to get the movie results
 
     const gptQuery =
@@ -39,7 +39,7 @@ const GptSearchBar = () => {
     });
     //if(!gptResults.choices)  write error handling
 
-    console.log(gptResults?.choices[0]?.message?.content);
+    // console.log(gptResults?.choices[0]?.message?.content);
 
     const gptMovies = gptResults?.choices[0]?.message?.content.split(",");
 
