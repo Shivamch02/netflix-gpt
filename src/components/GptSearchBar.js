@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import lang from "../utils/languageConstants";
 import { useDispatch, useSelector } from "react-redux";
-import openai from "../utils/openai";
+import { textModel } from "../utils/openai";
 import { API_OPTIONS } from "../utils/constants";
 import { addGptMovieResults } from "../utils/gptSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -24,33 +24,81 @@ const GptSearchBar = () => {
     return json.results;
   };
 
+  // const handleGptSearchClick = async () => {
+
+  //   // console.log(searchText.current.value);
+  //   //make an api call to get the movie results
+
+  //   const gptQuery =
+  //     "Act as a Movie Recommendation system and suggest some movies for the query : " +
+  //     searchText.current.value +
+  //     ". only give me names of 5 movies, comma separated like the example result given ahead. Example Result : John Wick, Pathaan, Jawan, Salar, Fast & Furious";
+
+  //   const gptResults = await openai.chat.completions.create({
+  //     messages: [{ role: "user", content: gptQuery }],
+  //     model: "gpt-3.5-turbo",
+  //   });
+  //   //if(!gptResults.choices)  write error handling
+
+  //   // console.log(gptResults?.choices[0]?.message?.content);
+
+  //   const gptMovies = gptResults?.choices[0]?.message?.content.split(",");
+
+  //   const promiseArray = gptMovies.map((movie) => searchMovieTMDB(movie));
+
+  //   const tmdbResults = await Promise.all(promiseArray);
+  //   console.log(tmdbResults);
+
+  //   dispatch(
+  //     addGptMovieResults({ movieNames: gptMovies, movieResults: tmdbResults })
+  //   );
+  // };
+  // Movie recommendation handler component
   const handleGptSearchClick = async () => {
-    // console.log(searchText.current.value);
-    //make an api call to get the movie results
+    try {
+      const prompt = `Act as a movie recommendation system. 
+      Suggest 5 movies for: "${searchText.current.value}".
+      Return ONLY comma-separated names. 
+      Example: Inception, The Dark Knight, Interstellar, Tenet, Memento`;
 
-    const gptQuery =
-      "Act as a Movie Recommendation system and suggest some movies for the query : " +
-      searchText.current.value +
-      ". only give me names of 5 movies, comma separated like the example result given ahead. Example Result : John Wick, Pathaan, Jawan, Salar, Fast & Furious";
+      // Generate content
+      const result = await textModel.generateContent(prompt);
+      const response = await result.response;
 
-    const gptResults = await openai.chat.completions.create({
-      messages: [{ role: "user", content: gptQuery }],
-      model: "gpt-3.5-turbo",
-    });
-    //if(!gptResults.choices)  write error handling
+      if (!response.text()) {
+        throw new Error("Empty response from Gemini");
+      }
 
-    // console.log(gptResults?.choices[0]?.message?.content);
+      // Clean and parse response
+      const moviesString = response
+        .text()
+        .replace(/["*•]/g, "") // Remove special characters
+        .replace(/\d+\./g, "") // Remove numbering
+        .trim();
 
-    const gptMovies = gptResults?.choices[0]?.message?.content.split(",");
+      const gptMovies = moviesString
+        .split(",")
+        .map((movie) => movie.trim().replace(/\.$/, ""));
 
-    const promiseArray = gptMovies.map((movie) => searchMovieTMDB(movie));
+      // TMDB integration
+      const tmdbResults = await Promise.all(
+        gptMovies.map((movie) => searchMovieTMDB(movie))
+      );
 
-    const tmdbResults = await Promise.all(promiseArray);
-    console.log(tmdbResults);
-
-    dispatch(
-      addGptMovieResults({ movieNames: gptMovies, movieResults: tmdbResults })
-    );
+      dispatch(
+        addGptMovieResults({
+          movieNames: gptMovies,
+          movieResults: tmdbResults,
+        })
+      );
+    } catch (error) {
+      console.error("Gemini API Error:", error);
+      // Add user-friendly error handling
+      dispatch(
+        // setError("Failed to get movie recommendations. Please try again.")
+        console.log("Failed to get movie recommendations. Please try again.")
+      );
+    }
   };
 
   return (
