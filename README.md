@@ -1,4 +1,4 @@
-# Netflix GPT
+# FlixFusion
 
 - Create React App
 - Configured TailwindCSS
@@ -31,6 +31,6 @@
   - MovieSuggestions
     - Movie Lists \* N
 
-- Netflix GPT
+- FlixFusion
   - Search Bar
     -Movie Suggestions

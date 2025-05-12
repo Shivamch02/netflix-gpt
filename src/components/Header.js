@@ -54,7 +54,8 @@ const Header = () => {
 
   return (
     <div className="absolute w-screen px-8 py-2 bg-gradient-to-b from-black z-10 flex flex-col md:flex-row justify-between ">
-      <img className="w-44 mx-auto md:mx-0" src={LOGO} alt="logo" />
+      {/* <img className="w-44 mx-auto md:mx-0" src={LOGO} alt="logo" /> */}
+      <h1 className="text-red-700 text-3xl font-bold">FlixFusion</h1>
       {user && (
         <div className="flex p-2 justify-between">
           {showGptSearch && (
@@ -73,7 +74,7 @@ const Header = () => {
             className="py-2 px-4 bg-purple-600 mx-4 md:mt-1 h-10 rounded-lg text-white"
             onClick={handleGptSearchClick}
           >
-            {showGptSearch ? "Home" : "GPT Search"}
+            {showGptSearch ? "Home" : "AI Search"}
           </button>
           <img
             className="hidden md:block md:mt-1 w-10 h-10 rounded-lg cursor-pointer"
